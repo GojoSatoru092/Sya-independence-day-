@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#d71920">
+<meta name="description" content="A little Independence Day surprise for Sya.">
+<title>Untuk Sya 🇮🇩</title>
+<style>
+:root{
+  --red:#d71920;
+  --red2:#a80f17;
+  --white:#fff;
+  --ink:#161616;
+  --muted:#666;
+  --card:rgba(255,255,255,.9);
+  --shadow:0 24px 70px rgba(70,0,0,.18);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  overflow:hidden;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 15% 10%,rgba(215,25,32,.15),transparent 28%),
+    radial-gradient(circle at 85% 80%,rgba(215,25,32,.12),transparent 30%),
+    linear-gradient(180deg,#fff 0%,#fff 48%,#fff5f5 100%);
+}
+button{font:inherit}
+canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:60}
+
+/* top progress + nav */
+.progress{position:fixed;top:0;left:0;width:100%;height:4px;z-index:50;background:rgba(0,0,0,.05)}
+.progress i{display:block;height:100%;width:20%;background:var(--red);transition:width .5s cubic-bezier(.4,0,.2,1)}
+.topnav{
+  position:fixed;top:16px;left:50%;transform:translateX(-50%);
+  width:min(920px,calc(100% - 24px));z-index:40;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;border:1px solid rgba(215,25,32,.12);
+  border-radius:999px;background:rgba(255,255,255,.72);
+  backdrop-filter:blur(18px);box-shadow:0 8px 35px rgba(0,0,0,.08);
+}
+.brand{font-weight:900;letter-spacing:-.03em}
+.brand span{color:var(--red)}
+.navbtn{
+  border:0;background:var(--red);color:#fff;padding:9px 15px;
+  border-radius:999px;font-weight:800;cursor:pointer
+}
+
+/* slides */
+.slides{position:relative;width:100%;height:100svh}
+.slide{
+  position:absolute;inset:0;display:grid;place-items:center;
+  padding:100px 20px 100px;overflow-y:auto;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transform:translateX(40px);
+  transition:opacity .55s ease,transform .55s ease;
+}
+.slide.active{opacity:1;visibility:visible;pointer-events:auto;transform:translateX(0)}
+.slide.prev{transform:translateX(-40px)}
+.slide-inner{width:min(1040px,100%);text-align:center;margin:auto}
+
+.flag{
+  width:min(310px,72vw);aspect-ratio:3/2;margin:0 auto 28px;
+  border-radius:18px;overflow:hidden;box-shadow:var(--shadow);
+  transform:rotate(-2deg);animation:float 4s ease-in-out infinite;
+}
+.flag .red{height:50%;background:var(--red)}
+.flag .white{height:50%;background:#fff}
+.eyebrow{
+  display:inline-flex;gap:8px;align-items:center;padding:7px 12px;
+  border-radius:999px;background:#fff0f0;color:var(--red);
+  font-size:.85rem;font-weight:900;margin-bottom:14px;
+}
+h1{
+  font-size:clamp(2.6rem,9vw,7rem);line-height:.9;
+  letter-spacing:-.075em;margin:0 auto 18px;max-width:1000px;
+}
+h1 em{font-style:normal;color:var(--red)}
+.lead{font-size:clamp(1rem,2.3vw,1.2rem);color:var(--muted);max-width:640px;margin:0 auto 26px;line-height:1.65}
+.cta{
+  display:inline-flex;align-items:center;gap:10px;border:0;cursor:pointer;
+  background:var(--ink);color:#fff;padding:15px 21px;border-radius:14px;
+  font-weight:900;box-shadow:0 14px 35px rgba(0,0,0,.16);
+  transition:.2s transform,.2s box-shadow;
+}
+.cta:hover{transform:translateY(-3px);box-shadow:0 20px 45px rgba(0,0,0,.2)}
+
+.section-kicker{color:var(--red);font-weight:900;text-transform:uppercase;letter-spacing:.12em;font-size:.75rem}
+h2{font-size:clamp(1.9rem,4.6vw,3.6rem);letter-spacing:-.06em;line-height:.98;margin:9px 0 15px}
+.card{
+  background:var(--card);border:1px solid rgba(215,25,32,.1);
+  border-radius:28px;box-shadow:var(--shadow);padding:clamp(22px,4.5vw,44px);
+  backdrop-filter:blur(14px);
+}
+.message{font-size:clamp(1rem,1.9vw,1.25rem);line-height:1.8;color:#333;text-align:left}
+.message strong{color:var(--red)}
+.pillrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px;justify-content:center}
+.pill{padding:10px 13px;border-radius:999px;background:#fff0f0;color:#8f1016;font-weight:800}
+
+.game-card{display:grid;grid-template-columns:1.1fr .9fr;gap:26px;align-items:center;text-align:left}
+.game{
+  position:relative;height:290px;border-radius:22px;overflow:hidden;
+  background:linear-gradient(#ffe9e9,#fff);
+  border:2px solid #ffd0d0;touch-action:none;
+}
+.target{
+  position:absolute;width:58px;height:58px;border-radius:50%;border:0;
+  background:var(--red);color:#fff;font-size:1.6rem;cursor:pointer;
+  box-shadow:0 8px 22px rgba(215,25,32,.3);display:grid;place-items:center;
+  transform:translate(-50%,-50%);user-select:none;
+}
+.game-ui{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-weight:900}
+.start{border:0;background:#111;color:#fff;padding:10px 14px;border-radius:10px;font-weight:800;cursor:pointer}
+
+.countdown{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px
+}
+.timebox{background:#fff;border:1px solid #eee;border-radius:18px;padding:16px 8px;text-align:center}
+.timebox b{display:block;font-size:clamp(1.6rem,4.6vw,2.7rem);letter-spacing:-.06em}
+.timebox span{font-size:.7rem;color:#888;font-weight:800;text-transform:uppercase}
+
+.final .big{font-size:clamp(2.6rem,9vw,6rem);line-height:.85;font-weight:1000;letter-spacing:-.08em;color:var(--red);margin:15px 0}
+
+@keyframes float{50%{transform:rotate(2deg) translateY(-9px)}}
+
+/* bottom nav controls */
+.controls{
+  position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+  z-index:40;display:flex;align-items:center;gap:14px;
+  padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.75);
+  border:1px solid rgba(215,25,32,.12);backdrop-filter:blur(18px);
+  box-shadow:0 8px 35px rgba(0,0,0,.08);
+}
+.arrow{
+  width:40px;height:40px;border-radius:50%;border:0;background:var(--ink);
+  color:#fff;font-size:1.1rem;cursor:pointer;display:grid;place-items:center;
+  transition:.2s transform,.2s opacity;
+}
+.arrow:hover{transform:scale(1.08)}
+.arrow:disabled{opacity:.3;cursor:default;transform:none}
+.dots{display:flex;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:#ddd;border:0;cursor:pointer;padding:0;transition:.25s}
+.dot.active{width:22px;border-radius:5px;background:var(--red)}
+
+@media(max-width:760px){
+  .topnav{top:10px;padding:8px 12px}
+  .slide{padding:82px 16px 96px}
+  .game-card{grid-template-columns:1fr}
+  .game{height:260px}
+  .countdown{gap:7px}
+  .timebox{padding:12px 4px}
+  .controls{gap:10px;padding:8px 12px;bottom:12px}
+  .arrow{width:36px;height:36px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="progress"><i id="bar"></i></div>
+<canvas id="confetti"></canvas>
+
+<nav class="topnav">
+  <div class="brand">Sya <span>🇮🇩</span></div>
+  <button class="navbtn" onclick="surprise()">Surprise ✨</button>
+</nav>
+
+<main class="slides" id="slides">
+
+  <section class="slide active" data-slide="0">
+    <div class="slide-inner">
+      <div class="flag" aria-label="Indonesian flag"><div class="red"></div><div class="white"></div></div>
+      <div class="eyebrow">17 AGUSTUS • HARI KEMERDEKAAN INDONESIA</div>
+      <h1>Selamat Hari<br><em>Kemerdekaan, Sya!</em> 🇮🇩</h1>
+      <p class="lead">A tiny Independence Day surprise for one very specific human. Yes, you. Don't pretend you weren't curious. 👀</p>
+      <button class="cta" onclick="goTo(1)">Klik kalau berani →</button>
+    </div>
+  </section>
+
+  <section class="slide" id="message" data-slide="1">
+    <div class="slide-inner">
+      <div class="section-kicker">sedikit pesan</div>
+      <h2>Untuk Sya yang<br>nggak bisa diem 😭</h2>
+      <div class="card">
+        <div class="message">
+          Selamat Hari Kemerdekaan Indonesia, Sya! 🇮🇩❤️<br><br>
+          Semoga hari ini penuh tawa, makanan enak, dan tentu saja
+          <strong>nggak ada drama</strong>… walaupun kita sama-sama tahu kemungkinan itu kecil 😭
+          <br><br>
+          Indonesia sudah merdeka sejak 1945, tapi sepertinya kamu belum merdeka
+          dari gangguan aku. <strong>Maaf ya 😌</strong>
+          <br><br>
+          Pokoknya enjoy your day, celebrate properly, and jangan lupa senyum.
+          Kalau ada lomba 17-an, jangan kalah ya. Masa kalah sama bocah komplek 😭
+        </div>
+        <div class="pillrow">
+          <div class="pill">🇮🇩 Merah Putih</div>
+          <div class="pill">🎉 17 Agustus</div>
+          <div class="pill">😭 Jangan kalah lomba</div>
+          <div class="pill">😌 Tetap diganggu</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="2">
+    <div class="slide-inner">
+      <div class="section-kicker">mini game</div>
+      <h2>Tangkap merahnya 👀</h2>
+      <div class="card game-card">
+        <div>
+          <p class="message">Tangkap lingkaran merah sebanyak mungkin dalam <strong>15 detik</strong>. Kalau skornya jelek, kita anggap koneksi internet yang salah.</p>
+          <button class="start" onclick="startGame()">Mulai lomba 🇮🇩</button>
+          <div class="game-ui"><span>Score: <b id="score">0</b></span><span>Time: <b id="gameTime">15</b>s</span></div>
+        </div>
+        <div class="game" id="game" aria-label="Mini game area"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="3">
+    <div class="slide-inner">
+      <div class="section-kicker">countdown</div>
+      <h2>Menuju 17 Agustus 🇮🇩</h2>
+      <div class="card">
+        <p class="message">Sedikit lagi. Sampai saatnya Indonesia merayakan hari kemerdekaannya lagi.</p>
+        <div class="countdown">
+          <div class="timebox"><b id="days">00</b><span>Days</span></div>
+          <div class="timebox"><b id="hours">00</b><span>Hours</span></div>
+          <div class="timebox"><b id="mins">00</b><span>Minutes</span></div>
+          <div class="timebox"><b id="secs">00</b><span>Seconds</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="final" data-slide="4">
+    <div class="slide-inner">
+      <div class="card final">
+        <div class="section-kicker">last thing</div>
+        <div class="big">MERDEKA! 🇮🇩</div>
+        <p class="message" style="text-align:center">Semoga kamu selalu punya alasan untuk tersenyum, Sya.<br>Selamat 17 Agustus ❤️</p>
+        <button class="cta" onclick="surprise()">Sekali lagi ✨</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="controls">
+  <button class="arrow" id="prevBtn" onclick="goTo(current-1)" aria-label="Previous slide">←</button>
+  <div class="dots" id="dots"></div>
+  <button class="arrow" id="nextBtn" onclick="goTo(current+1)" aria-label="Next slide">→</button>
+</div>
+
+<footer style="display:none">Made with way too much effort for Sya 🇮🇩</footer>
+
+<script>
+const $=s=>document.querySelector(s);
+const bar=$("#bar");
+const slideEls=[...document.querySelectorAll(".slide")];
+const total=slideEls.length;
+let current=0;
+
+const dotsWrap=$("#dots");
+slideEls.forEach((_,i)=>{
+  const d=document.createElement("button");
+  d.className="dot"+(i===0?" active":"");
+  d.setAttribute("aria-label","Go to slide "+(i+1));
+  d.onclick=()=>goTo(i);
+  dotsWrap.appendChild(d);
+});
+const dotEls=[...dotsWrap.children];
+const prevBtn=$("#prevBtn"),nextBtn=$("#nextBtn");
+
+function updateUI(){
+  bar.style.width=((current+1)/total*100)+"%";
+  dotEls.forEach((d,i)=>d.classList.toggle("active",i===current));
+  prevBtn.disabled=current===0;
+  nextBtn.disabled=current===total-1;
+}
+
+function goTo(i){
+  i=Math.max(0,Math.min(total-1,i));
+  if(i===current)return;
+  slideEls[current].classList.remove("active");
+  slideEls[current].classList.toggle("prev",i<current);
+  slideEls[i].classList.remove("prev");
+  slideEls[i].classList.add("active");
+  current=i;
+  updateUI();
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowRight")goTo(current+1);
+  if(e.key==="ArrowLeft")goTo(current-1);
+});
+
+// swipe support
+let touchX=null;
+document.addEventListener("touchstart",e=>{touchX=e.touches[0].clientX},{passive:true});
+document.addEventListener("touchend",e=>{
+  if(touchX===null)return;
+  const dx=e.changedTouches[0].clientX-touchX;
+  if(Math.abs(dx)>50) goTo(current+(dx<0?1:-1));
+  touchX=null;
+},{passive:true});
+
+function surprise(){
+  burst();
+  goTo(1);
+}
+
+const canvas=$("#confetti"),ctx=canvas.getContext("2d");
+let pieces=[],raf;
+function resize(){canvas.width=innerWidth*devicePixelRatio;canvas.height=innerHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
+addEventListener("resize",resize);resize();
+function burst(){
+  const cx=innerWidth/2,cy=innerHeight*.28;
+  for(let i=0;i<120;i++) pieces.push({
+    x:cx,y:cy,vx:(Math.random()-.5)*10,vy:Math.random()*-9-2,
+    g:.25+Math.random()*.12,s:4+Math.random()*7,a:1,r:Math.random()*Math.PI*2,
+    c:Math.random()<.5?"#d71920":"#ffffff"
+  });
+  cancelAnimationFrame(raf); draw();
+}
+function draw(){
+  ctx.clearRect(0,0,innerWidth,innerHeight);
+  pieces=pieces.filter(p=>p.a>.02);
+  pieces.forEach(p=>{
+    p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.r+=.12;p.a-=.008;
+    ctx.save();ctx.globalAlpha=p.a;ctx.translate(p.x,p.y);ctx.rotate(p.r);
+    ctx.fillStyle=p.c;ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.65);ctx.restore();
+  });
+  if(pieces.length)raf=requestAnimationFrame(draw);
+}
+
+// Countdown to Indonesian Independence Day 2026, Jakarta time.
+// Date is intentionally fixed so the page remains correct even if opened in another timezone.
+function updateCountdown(){
+  const target=new Date("2026-08-17T00:00:00+07:00").getTime();
+  let d=Math.max(0,target-Date.now());
+  const days=Math.floor(d/86400000);d%=86400000;
+  const hours=Math.floor(d/3600000);d%=3600000;
+  const mins=Math.floor(d/60000);d%=60000;
+  const secs=Math.floor(d/1000);
+  $("#days").textContent=String(days).padStart(2,"0");
+  $("#hours").textContent=String(hours).padStart(2,"0");
+  $("#mins").textContent=String(mins).padStart(2,"0");
+  $("#secs").textContent=String(secs).padStart(2,"0");
+}
+updateCountdown();setInterval(updateCountdown,1000);
+
+// Mini game
+let timer=null,playing=false,score=0,time=15;
+const game=$("#game");
+function moveTarget(){
+  let t=game.querySelector(".target");
+  if(!t){t=document.createElement("button");t.className="target";t.textContent="🇮🇩";t.setAttribute("aria-label","Catch me");game.appendChild(t)}
+  const pad=34;
+  const x=pad+Math.random()*(game.clientWidth-pad*2);
+  const y=pad+Math.random()*(game.clientHeight-pad*2);
+  t.style.left=x+"px";t.style.top=y+"px";
+  t.onclick=()=>{if(!playing)return;score++;$("#score").textContent=score;moveTarget();burstSmall(x,y)};
+}
+function burstSmall(x,y){
+  for(let i=0;i<8;i++) pieces.push({x:game.getBoundingClientRect().left+x,y:game.getBoundingClientRect().top+y,vx:(Math.random()-.5)*4,vy:(Math.random()-1)*4,g:.12,s:4,a:1,r:0,c:Math.random()<.5?"#d71920":"#fff"});
+  cancelAnimationFrame(raf);draw();
+}
+function startGame(){
+  if(playing)return;
+  playing=true;score=0;time=15;$("#score").textContent=0;$("#gameTime").textContent=time;moveTarget();
+  timer=setInterval(()=>{
+    time--;$("#gameTime").textContent=time;
+    if(time<=0){clearInterval(timer);playing=false;const t=game.querySelector(".target");if(t)t.remove();burst();alert("Time's up! 🇮🇩 Score: "+score);}
+  },1000);
+}
+
+updateUI();
+</script>
+</body>
+</html>
